@@ -1,0 +1,72 @@
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Snake Game</title>
+  <style>
+    canvas { background: #000; display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;">Snake Game 🐍</h1>
+  <canvas id="game" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const grid = 20;
+    let snake = [{ x: 160, y: 160 }];
+    let direction = "right";
+    let food = { x: 200, y: 200 };
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowUp" && direction !== "down") direction = "up";
+      if (e.key === "ArrowDown" && direction !== "up") direction = "down";
+      if (e.key === "ArrowLeft" && direction !== "right") direction = "left";
+      if (e.key === "ArrowRight" && direction !== "left") direction = "right";
+    });
+
+    function gameLoop() {
+      const head = { ...snake[0] };
+
+      if (direction === "up") head.y -= grid;
+      if (direction === "down") head.y += grid;
+      if (direction === "left") head.x -= grid;
+      if (direction === "right") head.x += grid;
+
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        food = {
+        x: Math.floor(Math.random() * 20) * grid,
+          y: Math.floor(Math.random() * 20) * grid
+        };
+      } else {
+        snake.pop();
+      }
+
+      // Collision with wall or self
+      if (
+        head.x < 0 || head.x >= canvas.width ||
+        head.y < 0 || head.y >= canvas.height ||
+        snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)
+      ) {
+        alert("Game Over!");
+        snake = [{ x: 160, y: 160 }];
+        direction = "right";
+      }
+
+      // Draw
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "lime";
+      snake.forEach(seg => ctx.fillRect(seg.x, seg.y, grid, grid));
+      ctx.fillStyle = "red";
+      ctx.fillRect(food.x, food.y, grid, grid);
+    }
+
+    setInterval(gameLoop, 150);
+  </script>
+</body>
+</html>
